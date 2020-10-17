@@ -1,16 +1,10 @@
 package alexrnov.scollection;
 
 import android.os.Bundle;
-import android.view.View;
 import android.view.Menu;
-import android.view.Window;
-import android.view.WindowManager;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -19,10 +13,12 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import alexrnov.scollection.ui.light.LightSurfaceView;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-    private OGLView oglView; // используется в случае вывода рендера в отдельный компонент интерфейса
+    private LightSurfaceView lightSurfaceView; // используется в случае вывода рендера в отдельный компонент интерфейса
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

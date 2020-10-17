@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".ui.light.LightFragment">
 
-    <alexrnov.scollection.OGLView
-        android:id="@+id/oglView"
+    <alexrnov.scollection.ui.light.LightSurfaceView
+        android:id="@+id/oglViewLight"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"

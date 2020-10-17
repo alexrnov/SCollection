@@ -12,24 +12,35 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import alexrnov.scollection.OGLView;
 import alexrnov.scollection.R;
 
 public class LightFragment extends Fragment {
 
     private LightViewModel lightViewModel;
+    private OGLView oglView; // используется в случае вывода рендера в отдельный компонент интерфейса
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         lightViewModel =
                 ViewModelProviders.of(this).get(LightViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-        final TextView textView = root.findViewById(R.id.text_home);
-        lightViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+        View root = inflater.inflate(R.layout.fragment_light, container, false);
+
+        oglView = root.findViewById(R.id.oglView);
+        oglView.init(this.getActivity());
         return root;
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        oglView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        oglView.onPause();
     }
 }

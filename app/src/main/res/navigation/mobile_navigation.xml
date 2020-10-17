@@ -9,7 +9,7 @@
         android:id="@+id/nav_light"
         android:name="alexrnov.scollection.ui.light.LightFragment"
         android:label="@string/menu_light"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_light" />
 
     <fragment
         android:id="@+id/nav_gallery"

@@ -18,7 +18,7 @@ class RefractionView3D(widthScreen: Int, heightScreen: Int):
         Matrix.setIdentityM(modelMatrix, 0)
         angle = 45.83014f
         // переместить куб вверх/вниз и влево/вправо
-        Matrix.translateM(modelMatrix, 0, -2.0f, -0.8f, -17.0f)
+        Matrix.translateM(modelMatrix, 0, -2.1f, -0.8f, -17.0f)
         // угол и направления вращения
         Matrix.rotateM(modelMatrix, 0, angle, 0.5f, 0.5f, 0.5f)
         // отдельная mv-матрица для загрузки в шейдер

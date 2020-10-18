@@ -2,18 +2,19 @@ package alexrnov.scollection.gles.objects;
 
 import android.content.Context;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import alexrnov.cosmichunter.view.View3D;
 import alexrnov.scollection.R;
 import alexrnov.scollection.gles.LinkedProgram;
 import alexrnov.scollection.view.AsteroidView3D;
 import alexrnov.scollection.view.DiffuseView3D;
-import alexrnov.scollection.view.FogView3D;
+import alexrnov.scollection.view.MultiTextureView3D;
 
 import static alexrnov.scollection.gles.Textures.loadTextureWithMipMapFromRaw;
 
 /** Класс для планеты, которая используется в четвертом уровне */
-public class Fog extends Object3D implements Asteroid {
+public class MultiTexture extends Object3D implements Asteroid {
     private final int programObject;
     // ссылка на переменную вершинного шейдера, содержащую итоговую MVP-матрицу
     private final int mvpMatrixLink;
@@ -23,6 +24,7 @@ public class Fog extends Object3D implements Asteroid {
     private final int pointViewMatrixLink;
     // ссылка на переменную вершинного шейдера, которая является семплером
     private final int samplerLink;
+    private final int samplerLink2;
     // ссылка на переменную вершинного шейдера, содержащую вектор цвета
     // внешнего освещения
     private final int ambientLightColorLink;
@@ -37,6 +39,8 @@ public class Fog extends Object3D implements Asteroid {
     private final int diffuseLightIntensityLink;
     // обработчик текстуры
     private final int textureID;
+    private final int textureID2;
+
 
     private final int positionLink; // индекс переменной атрибута для вершин
     private final int textureCoordinatesLink; // индекс переменной атрибута для текстурных координат
@@ -47,7 +51,7 @@ public class Fog extends Object3D implements Asteroid {
 
     private Explosion explosion;
 
-    public Fog(double versionGL, Context context, float scale, String objectPath) { //, TypeAsteroid type) {
+    public MultiTexture(double versionGL, Context context, float scale, String objectPath) { //, TypeAsteroid type) {
         super(context, scale, objectPath);
 
         //загрузка шейдеров из каталога raw
@@ -61,8 +65,8 @@ public class Fog extends Object3D implements Asteroid {
                     "shaders/gles20/basalt_asteroid_f.glsl");
         } else if (versionGL == 3.0) {
             linkProgram = new LinkedProgram(context,
-                    "shaders/gles30/fog_v.glsl",
-                    "shaders/gles30/fog_f.glsl");
+                    "shaders/gles30/multi_texture_v.glsl",
+                    "shaders/gles30/multi_texture_f.glsl");
         }
 
 
@@ -85,8 +89,11 @@ public class Fog extends Object3D implements Asteroid {
         pointViewMatrixLink = GLES20.glGetUniformLocation(programObject, "u_pointViewMatrix");
         //получить местоположение семплера
         samplerLink = GLES20.glGetUniformLocation(programObject, "s_texture");
+        samplerLink2 = GLES20.glGetUniformLocation(programObject, "s_texture2");
         //textureID = loadTextureFromRaw(context, R.raw.dolerite_texture);
-        textureID = loadTextureWithMipMapFromRaw(context, R.raw.fog_texture); //загрузить текстуру
+        textureID = loadTextureWithMipMapFromRaw(context, R.raw.diffuse_texture); //загрузить текстуру
+        textureID2 = loadTextureWithMipMapFromRaw(context, R.raw.multi_texture2); //загрузить текстуру
+
         ambientLightColorLink = GLES20.glGetUniformLocation(programObject,
                 "u_ambientLight.color");
         ambientLightIntensityLink = GLES20.glGetUniformLocation(programObject,
@@ -144,7 +151,7 @@ public class Fog extends Object3D implements Asteroid {
 
     @Override
     public void setView(View3D view) {
-        if (view instanceof FogView3D) this.view = (FogView3D) view;
+        if (view instanceof MultiTextureView3D) this.view = (MultiTextureView3D) view;
     }
 
     @Override
@@ -194,7 +201,7 @@ public class Fog extends Object3D implements Asteroid {
         // окружающего света
         GLES20.glUniform3f(ambientLightColorLink, 1.0f, 1.0f, 1.0f);
         // передать в шейдер интенсивность окружающего света
-        GLES20.glUniform1f(ambientLightIntensityLink, 0.5f);
+        GLES20.glUniform1f(ambientLightIntensityLink, 0.2f);
 
         GLES20.glUniform3f(diffuseLightColorLink, 1.0f, 1.0f, 1.0f);
         GLES20.glUniform1f(diffuseLightIntensityLink, 1.5f);
@@ -216,16 +223,27 @@ public class Fog extends Object3D implements Asteroid {
         // уровня пирамиды. Для большинства GPU билинейная фильтрация быстрее трилинейной
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
                 GLES20.GL_LINEAR_MIPMAP_NEAREST);
-
-
         // рисовать с трилинейным фильтрованием
         //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
         // GLES20.GL_LINEAR_MIPMAP_LINEAR);
-
         // установить текстурную единицу семплера в 0, что означает, что
         // будет использоваться текстурный блок GL_TEXTURE0, к которой
         // привязана текстура textureId
         GLES20.glUniform1i(samplerLink, 0);
+
+        GLES30.glEnable(GLES30.GL_BLEND);
+        GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA);
+
+
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+        //привязать текстуру к активному текстурному блоку
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID2);
+        //set the light map sampler to texture unit1
+        GLES20.glUniform1i(samplerLink2, 1);
+
+
+
+
         // MV-матрица загружается в соответствующую uniform-переменную
         GLES20.glUniformMatrix4fv(mvMatrixLink, 1, false,
                 view.getMVMatrixAsFloatBuffer());
@@ -248,6 +266,8 @@ public class Fog extends Object3D implements Asteroid {
         GLES20.glDisableVertexAttribArray(textureCoordinatesLink); // отключить атрибут координат текстуры
         GLES20.glDisableVertexAttribArray(normalLink); // отключить атрибут нормалей
 
+
+        GLES30.glDisable(GLES30.GL_BLEND);
         //GLES30.glFinish();
     }
 

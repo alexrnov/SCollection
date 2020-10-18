@@ -11,6 +11,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import alexrnov.scollection.gles.objects.Cell;
 import alexrnov.scollection.gles.objects.Fog;
+import alexrnov.scollection.gles.objects.MultiTexture;
 import alexrnov.scollection.view.AnisotropyView3D;
 import alexrnov.scollection.view.CellView3D;
 import alexrnov.scollection.view.FogView3D;
@@ -22,6 +23,7 @@ import alexrnov.scollection.gles.objects.Refraction;
 import alexrnov.scollection.gles.objects.Specular;
 import alexrnov.scollection.utils.MeanValue;
 import alexrnov.scollection.view.DiffuseView3D;
+import alexrnov.scollection.view.MultiTextureView3D;
 import alexrnov.scollection.view.RefractionView3D;
 import alexrnov.scollection.view.SpecularView3D;
 
@@ -36,6 +38,8 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
     private Refraction refraction;
     private Cell cell;
     private Fog fog;
+    private MultiTexture multiTexture;
+
     // переменные используются в другом потоке (main)
     private volatile int widthDisplay;
     private volatile int heightDisplay;
@@ -78,6 +82,7 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
         refraction = new Refraction(versionGL, context, 0.6f);
         cell = new Cell(versionGL, context, 0.6f, "objects/sphere.obj");
         fog = new Fog(versionGL, context, 0.6f, "objects/torus.obj");
+        multiTexture = new MultiTexture(versionGL, context, 0.6f, "objects/sphere.obj");
     }
 
     @Override
@@ -94,6 +99,7 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
            refraction.setView(new RefractionView3D(width, height));
            cell.setView(new CellView3D(width, height));
            fog.setView(new FogView3D(width, height));
+           multiTexture.setView(new MultiTextureView3D(width, height));
         }
         firstRun = false;
     }
@@ -133,6 +139,9 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
 
         fog.draw();
         fog.getView().spotPosition(delta);
+
+        multiTexture.draw();
+        multiTexture.getView().spotPosition(delta);
 
         defineDeltaTime();
     }

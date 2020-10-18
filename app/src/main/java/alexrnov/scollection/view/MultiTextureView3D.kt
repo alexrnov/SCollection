@@ -9,7 +9,7 @@ import java.nio.FloatBuffer
  * Определяет поведение астероида, - такие его характеристики как:
  * скорость и направление движения, вращение
  */
-class DiffuseView3D(widthScreen: Int, heightScreen: Int):
+class MultiTextureView3D(widthScreen: Int, heightScreen: Int):
         AsteroidView3D(widthScreen, heightScreen) {
 
     private var angle: Float = 0.0f
@@ -20,7 +20,7 @@ class DiffuseView3D(widthScreen: Int, heightScreen: Int):
         angle += delta
         //Log.i("P", "angle = $angle")
         // переместить куб вверх/вниз и влево/вправо
-        Matrix.translateM(modelMatrix, 0, -2.1f, 0.8f, -17.0f)
+        Matrix.translateM(modelMatrix, 0, 2.28f, -0.8f, -17.0f)
         // угол и направления вращения
         Matrix.rotateM(modelMatrix, 0, angle, 0.0f, 0.5f, 0.0f)
         // отдельная mv-матрица для загрузки в шейдер

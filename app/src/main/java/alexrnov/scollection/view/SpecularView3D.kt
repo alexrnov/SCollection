@@ -18,7 +18,7 @@ class SpecularView3D(widthScreen: Int, heightScreen: Int):
         Matrix.setIdentityM(modelMatrix, 0)
         angle += delta
         // переместить куб вверх/вниз и влево/вправо
-        Matrix.translateM(modelMatrix, 0, -0.5f, 0.8f, -17.0f)
+        Matrix.translateM(modelMatrix, 0, -0.6f, 0.8f, -17.0f)
         // угол и направления вращения
         Matrix.rotateM(modelMatrix, 0, angle, 0.5f, 0.5f, 0.5f)
         // отдельная mv-матрица для загрузки в шейдер

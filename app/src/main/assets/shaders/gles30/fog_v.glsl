@@ -65,6 +65,14 @@ void main() {
 
     // calculate eye space position of every vertex
     vec4 v_eye_space_position = u_mvMatrix * a_position;
+
+    // obtain cartesian coordinate z
+    // this function gives the same results as length()
+    //float fogCoord = abs(v_eye_space_position.z / v_eye_space_position.w);
+
+    // this function is used instead distance(), when eye pos = 0, 0, 0
+    //float fogCoord = length(v_eye_space_position);
+
     float fogCoord = distance(v_eye_space_position.xyz, eye);
     v_fog_factor = getFogFactor(fogCoord);
 

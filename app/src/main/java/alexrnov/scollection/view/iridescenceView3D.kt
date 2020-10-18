@@ -9,7 +9,7 @@ import java.nio.FloatBuffer
  * Определяет поведение астероида, - такие его характеристики как:
  * скорость и направление движения, вращение
  */
-class PlanetView3D(widthScreen: Int, heightScreen: Int):
+class iridescenceView3D(widthScreen: Int, heightScreen: Int):
         AsteroidView3D(widthScreen, heightScreen) {
 
   private var angle: Float = 0.0f

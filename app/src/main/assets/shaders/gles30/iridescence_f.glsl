@@ -17,10 +17,10 @@ uniform sampler2D s_texture;
 const mediump float PI = 3.141592654;
 const mediump vec3 rgbK = 2.0 * PI * vec3(1.0/475.0, 1.0/510.0, 1.0/650.0);
 
-const mediump float iridescence = 15.0;
+const mediump float iridescence = 7.4;
 const mediump float minThickness = 50.0;
-const mediump float maxVariation = 34.0;
-const lowp float beginWave = 750.0;
+const mediump float maxVariation = 54.0;
+const lowp float beginWave = 1700.0;
 const lowp float endWave = 370.0;
 
 const lowp float c_alpha = 1.0;

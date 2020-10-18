@@ -9,15 +9,18 @@ import android.util.Log;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import alexrnov.cosmichunter.view.PlanetView3D;
-import alexrnov.scollection.gles.objects.Planet;
+import alexrnov.cosmichunter.view.AnisotropyView3D;
+import alexrnov.cosmichunter.view.iridescenceView3D;
+import alexrnov.scollection.gles.objects.Anisotropy;
+import alexrnov.scollection.gles.objects.iridescence;
 import alexrnov.scollection.utils.MeanValue;
 
 public class GallerySceneRenderer implements GLSurfaceView.Renderer {
 
     private Context context; // нужно ли синхронизировать?
     private double versionGL;
-    private Planet planet;
+    private iridescence iridescence;
+    private Anisotropy anisotropy;
     // переменные используются в другом потоке (main)
     private volatile int widthDisplay;
     private volatile int heightDisplay;
@@ -53,7 +56,8 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
         // реализация делает предпочтение на быстродействие
         GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
 
-        planet = new Planet(versionGL, context, 0.6f, "objects/planet.obj");
+        iridescence = new iridescence(versionGL, context, 0.6f, "objects/planet.obj");
+        anisotropy = new Anisotropy(versionGL, context, 0.6f, "objects/sphere.obj");
     }
 
     @Override
@@ -63,7 +67,8 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
 
         GLES20.glViewport(0, 0, width, height); // установить размер экрана
         if (firstRun) { // первый запуск приложения
-           planet.setView(new PlanetView3D(width, height));
+           iridescence.setView(new iridescenceView3D(width, height));
+           anisotropy.setView(new AnisotropyView3D(width, height));
         }
         firstRun = false;
     }
@@ -83,8 +88,11 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
         // материала, иначе объекты будут выглядеть неправильно
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
-        planet.draw();
-        planet.getView().spotPosition(delta);
+        iridescence.draw();
+        iridescence.getView().spotPosition(delta);
+
+        anisotropy.draw();
+        anisotropy.getView().spotPosition(delta);
 
         defineDeltaTime();
     }

@@ -3,7 +3,7 @@ package alexrnov.scollection.gles.objects;
 import android.content.Context;
 import android.opengl.GLES20;
 
-import alexrnov.cosmichunter.view.PlanetView3D;
+import alexrnov.cosmichunter.view.iridescenceView3D;
 import alexrnov.cosmichunter.view.View3D;
 import alexrnov.scollection.R;
 import alexrnov.scollection.gles.LinkedProgram;
@@ -15,7 +15,7 @@ import static alexrnov.scollection.gles.Textures.loadTextureWithMipMapFromRaw;
 //import static alexrnov.cosmichunter.Initialization.TAG;
 
 /** Класс для планеты, которая используется в четвертом уровне */
-public class Planet extends Object3D implements Asteroid {
+public class iridescence extends Object3D implements Asteroid {
   private final int programObject;
   // ссылка на переменную вершинного шейдера, содержащую итоговую MVP-матрицу
   private final int mvpMatrixLink;
@@ -44,12 +44,12 @@ public class Planet extends Object3D implements Asteroid {
   private final int textureCoordinatesLink; // индекс переменной атрибута для текстурных координат
   private final int normalLink; // индекс переменной атрибута для нормали
 
-  private PlanetView3D view;
+  private iridescenceView3D view;
   private final int[] VBO = new int[4];
 
   private Explosion explosion;
 
-  public Planet(double versionGL, Context context, float scale, String objectPath) { //, TypeAsteroid type) {
+  public iridescence(double versionGL, Context context, float scale, String objectPath) { //, TypeAsteroid type) {
     super(context, scale, objectPath);
 
     //загрузка шейдеров из каталога raw
@@ -63,8 +63,8 @@ public class Planet extends Object3D implements Asteroid {
               "shaders/gles20/planet_f.glsl");
     } else if (versionGL == 3.0) {
       linkProgram = new LinkedProgram(context,
-              "shaders/gles30/planet_v.glsl",
-              "shaders/gles30/planet_f.glsl");
+              "shaders/gles30/iridescence_v.glsl",
+              "shaders/gles30/iridescence_f.glsl");
     }
 
     //final String className = this.getClass().getSimpleName() + ".class: ";
@@ -87,7 +87,7 @@ public class Planet extends Object3D implements Asteroid {
     //получить местоположение семплера
     samplerLink = GLES20.glGetUniformLocation(programObject, "s_texture");
     //textureID = loadTextureFromRaw(context, R.raw.dolerite_texture);
-    textureID = loadTextureWithMipMapFromRaw(context, R.raw.planet_texture); //загрузить текстуру
+    textureID = loadTextureWithMipMapFromRaw(context, R.raw.iridescence_texture); //загрузить текстуру
     ambientLightColorLink = GLES20.glGetUniformLocation(programObject,
             "u_ambientLight.color");
     ambientLightIntensityLink = GLES20.glGetUniformLocation(programObject,
@@ -145,7 +145,7 @@ public class Planet extends Object3D implements Asteroid {
 
   @Override
   public void setView(View3D view) {
-    if (view instanceof PlanetView3D) this.view = (PlanetView3D) view;
+    if (view instanceof iridescenceView3D) this.view = (iridescenceView3D) view;
   }
 
   @Override

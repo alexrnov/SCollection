@@ -10,8 +10,10 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import alexrnov.scollection.gles.objects.Cell;
+import alexrnov.scollection.gles.objects.Fog;
 import alexrnov.scollection.view.AnisotropyView3D;
 import alexrnov.scollection.view.CellView3D;
+import alexrnov.scollection.view.FogView3D;
 import alexrnov.scollection.view.IridescenceView3D;
 import alexrnov.scollection.gles.objects.Anisotropy;
 import alexrnov.scollection.gles.objects.Diffuse;
@@ -33,6 +35,7 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
     private Diffuse diffuse;
     private Refraction refraction;
     private Cell cell;
+    private Fog fog;
     // переменные используются в другом потоке (main)
     private volatile int widthDisplay;
     private volatile int heightDisplay;
@@ -74,6 +77,7 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
         diffuse = new Diffuse(versionGL, context, 0.6f, "objects/suzanne.obj");
         refraction = new Refraction(versionGL, context, 0.6f);
         cell = new Cell(versionGL, context, 0.6f, "objects/sphere.obj");
+        fog = new Fog(versionGL, context, 0.6f, "objects/torus.obj");
     }
 
     @Override
@@ -89,6 +93,7 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
            diffuse.setView(new DiffuseView3D(width, height));
            refraction.setView(new RefractionView3D(width, height));
            cell.setView(new CellView3D(width, height));
+           fog.setView(new FogView3D(width, height));
         }
         firstRun = false;
     }
@@ -125,6 +130,9 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
 
         cell.draw();
         cell.getView().spotPosition(delta);
+
+        fog.draw();
+        fog.getView().spotPosition(delta);
 
         defineDeltaTime();
     }

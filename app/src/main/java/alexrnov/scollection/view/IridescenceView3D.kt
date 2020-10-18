@@ -1,4 +1,4 @@
-package alexrnov.cosmichunter.view
+package alexrnov.scollection.view
 
 import alexrnov.scollection.utils.commonGL.Buffers
 import alexrnov.scollection.view.AsteroidView3D
@@ -9,7 +9,7 @@ import java.nio.FloatBuffer
  * Определяет поведение астероида, - такие его характеристики как:
  * скорость и направление движения, вращение
  */
-class iridescenceView3D(widthScreen: Int, heightScreen: Int):
+class IridescenceView3D(widthScreen: Int, heightScreen: Int):
         AsteroidView3D(widthScreen, heightScreen) {
 
   private var angle: Float = 0.0f

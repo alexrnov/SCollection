@@ -1,7 +1,6 @@
 package alexrnov.scollection.view
 
 import alexrnov.scollection.utils.commonGL.Buffers
-import alexrnov.scollection.view.AsteroidView3D
 import android.opengl.Matrix
 import java.nio.FloatBuffer
 
@@ -9,7 +8,7 @@ import java.nio.FloatBuffer
  * Определяет поведение астероида, - такие его характеристики как:
  * скорость и направление движения, вращение
  */
-class AnisotropyView3D(widthScreen: Int, heightScreen: Int):
+class SpecularView3D(widthScreen: Int, heightScreen: Int):
         AsteroidView3D(widthScreen, heightScreen) {
 
     private var angle: Float = 0.0f
@@ -17,11 +16,11 @@ class AnisotropyView3D(widthScreen: Int, heightScreen: Int):
 
     override fun spotPosition(delta: Float) {
         Matrix.setIdentityM(modelMatrix, 0)
-        angle += delta * 0.24f
+        angle += delta
         // переместить куб вверх/вниз и влево/вправо
-        Matrix.translateM(modelMatrix, 0, 0.9f, 0.8f, -17.0f)
+        Matrix.translateM(modelMatrix, 0, -0.5f, 0.8f, -17.0f)
         // угол и направления вращения
-        Matrix.rotateM(modelMatrix, 0, angle, 0.0f, 0.5f, 0.0f)
+        Matrix.rotateM(modelMatrix, 0, angle, 0.5f, 0.5f, 0.5f)
         // отдельная mv-матрица для загрузки в шейдер
         Matrix.multiplyMM(modelViewMatrixForShader, 0, viewMatrix, 0, modelMatrix, 0)
         //Matrix.scaleM(modelMatrix, 0, 1f, 1f, 1f) // увеличить объект

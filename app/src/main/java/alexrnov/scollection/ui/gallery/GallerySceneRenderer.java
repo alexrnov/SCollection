@@ -9,18 +9,30 @@ import android.util.Log;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import alexrnov.cosmichunter.view.AnisotropyView3D;
-import alexrnov.cosmichunter.view.iridescenceView3D;
+import alexrnov.scollection.gles.objects.Cell;
+import alexrnov.scollection.view.AnisotropyView3D;
+import alexrnov.scollection.view.CellView3D;
+import alexrnov.scollection.view.IridescenceView3D;
 import alexrnov.scollection.gles.objects.Anisotropy;
-import alexrnov.scollection.gles.objects.iridescence;
+import alexrnov.scollection.gles.objects.Diffuse;
+import alexrnov.scollection.gles.objects.Iridescence;
+import alexrnov.scollection.gles.objects.Refraction;
+import alexrnov.scollection.gles.objects.Specular;
 import alexrnov.scollection.utils.MeanValue;
+import alexrnov.scollection.view.DiffuseView3D;
+import alexrnov.scollection.view.RefractionView3D;
+import alexrnov.scollection.view.SpecularView3D;
 
 public class GallerySceneRenderer implements GLSurfaceView.Renderer {
 
     private Context context; // нужно ли синхронизировать?
     private double versionGL;
-    private iridescence iridescence;
+    private Iridescence iridescence;
     private Anisotropy anisotropy;
+    private Specular specular;
+    private Diffuse diffuse;
+    private Refraction refraction;
+    private Cell cell;
     // переменные используются в другом потоке (main)
     private volatile int widthDisplay;
     private volatile int heightDisplay;
@@ -56,8 +68,12 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
         // реализация делает предпочтение на быстродействие
         GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
 
-        iridescence = new iridescence(versionGL, context, 0.6f, "objects/planet.obj");
+        iridescence = new Iridescence(versionGL, context, 0.6f, "objects/planet.obj");
         anisotropy = new Anisotropy(versionGL, context, 0.6f, "objects/sphere.obj");
+        specular = new Specular(versionGL, context, 0.6f, "objects/sphere.obj");
+        diffuse = new Diffuse(versionGL, context, 0.6f, "objects/suzanne.obj");
+        refraction = new Refraction(versionGL, context, 0.6f);
+        cell = new Cell(versionGL, context, 0.6f, "objects/sphere.obj");
     }
 
     @Override
@@ -67,8 +83,12 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
 
         GLES20.glViewport(0, 0, width, height); // установить размер экрана
         if (firstRun) { // первый запуск приложения
-           iridescence.setView(new iridescenceView3D(width, height));
+           iridescence.setView(new IridescenceView3D(width, height));
            anisotropy.setView(new AnisotropyView3D(width, height));
+           specular.setView(new SpecularView3D(width, height));
+           diffuse.setView(new DiffuseView3D(width, height));
+           refraction.setView(new RefractionView3D(width, height));
+           cell.setView(new CellView3D(width, height));
         }
         firstRun = false;
     }
@@ -93,6 +113,18 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
 
         anisotropy.draw();
         anisotropy.getView().spotPosition(delta);
+
+        specular.draw();
+        specular.getView().spotPosition(delta);
+
+        diffuse.draw();
+        diffuse.getView().spotPosition(delta);
+
+        refraction.draw();
+        refraction.getView().spotPosition(delta);
+
+        cell.draw();
+        cell.getView().spotPosition(delta);
 
         defineDeltaTime();
     }

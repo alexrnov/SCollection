@@ -6,16 +6,13 @@ import android.opengl.GLES20;
 import alexrnov.cosmichunter.view.View3D;
 import alexrnov.scollection.R;
 import alexrnov.scollection.gles.LinkedProgram;
-import alexrnov.scollection.view.AnisotropyView3D;
 import alexrnov.scollection.view.AsteroidView3D;
+import alexrnov.scollection.view.CellView3D;
 
 import static alexrnov.scollection.gles.Textures.loadTextureWithMipMapFromRaw;
 
-//import android.util.Log;
-//import static alexrnov.cosmichunter.Initialization.TAG;
-
 /** Класс для планеты, которая используется в четвертом уровне */
-public class Anisotropy extends Object3D implements Asteroid {
+public class Cell extends Object3D implements Asteroid {
     private final int programObject;
     // ссылка на переменную вершинного шейдера, содержащую итоговую MVP-матрицу
     private final int mvpMatrixLink;
@@ -25,7 +22,18 @@ public class Anisotropy extends Object3D implements Asteroid {
     private final int pointViewMatrixLink;
     // ссылка на переменную вершинного шейдера, которая является семплером
     private final int samplerLink;
-
+    // ссылка на переменную вершинного шейдера, содержащую вектор цвета
+    // внешнего освещения
+    private final int ambientLightColorLink;
+    // ссылка на переменную вершинного шейдера, содержащую значение
+    // интенсивности внешнего освещения
+    private final int ambientLightIntensityLink;
+    // ссылка на переменную вершинного шейдера, содержащую вектор цвета
+    // диффузного освещения
+    private final int diffuseLightColorLink;
+    // ссылка на переменную вершинного шейдера, содержащую значение
+    // интенсивности диффузного освещения
+    private final int diffuseLightIntensityLink;
     // обработчик текстуры
     private final int textureID;
 
@@ -33,12 +41,12 @@ public class Anisotropy extends Object3D implements Asteroid {
     private final int textureCoordinatesLink; // индекс переменной атрибута для текстурных координат
     private final int normalLink; // индекс переменной атрибута для нормали
 
-    private AsteroidView3D view;
+    private CellView3D view;
     private final int[] VBO = new int[4];
 
     private Explosion explosion;
 
-    public Anisotropy(double versionGL, Context context, float scale, String objectPath) { //, TypeAsteroid type) {
+    public Cell(double versionGL, Context context, float scale, String objectPath) { //, TypeAsteroid type) {
         super(context, scale, objectPath);
 
         //загрузка шейдеров из каталога raw
@@ -48,15 +56,13 @@ public class Anisotropy extends Object3D implements Asteroid {
         LinkedProgram linkProgram = null;
         if (versionGL == 2.0) {
             linkProgram = new LinkedProgram(context,
-                    "shaders/gles20/gas_asteroid_v.glsl",
-                    "shaders/gles20/gas_asteroid_f.glsl");
+                    "shaders/gles20/basalt_asteroid_v.glsl",
+                    "shaders/gles20/basalt_asteroid_f.glsl");
         } else if (versionGL == 3.0) {
             linkProgram = new LinkedProgram(context,
-                    "shaders/gles30/anisotropy_v.glsl",
-                    "shaders/gles30/anisotropy_f.glsl");
+                    "shaders/gles30/cell_v.glsl",
+                    "shaders/gles30/cell_f.glsl");
         }
-
-
 
 
         //final String className = this.getClass().getSimpleName() + ".class: ";
@@ -79,21 +85,32 @@ public class Anisotropy extends Object3D implements Asteroid {
         //получить местоположение семплера
         samplerLink = GLES20.glGetUniformLocation(programObject, "s_texture");
         //textureID = loadTextureFromRaw(context, R.raw.dolerite_texture);
-        textureID = loadTextureWithMipMapFromRaw(context, R.raw.anisotropy_texture); //загрузить текстуру
+        textureID = loadTextureWithMipMapFromRaw(context, R.raw.diffuse_texture); //загрузить текстуру
+        ambientLightColorLink = GLES20.glGetUniformLocation(programObject,
+                "u_ambientLight.color");
+        ambientLightIntensityLink = GLES20.glGetUniformLocation(programObject,
+                "u_ambientLight.intensity");
+        diffuseLightColorLink = GLES20.glGetUniformLocation(programObject,
+                "u_diffuseLight.color");
+        diffuseLightIntensityLink = GLES20.glGetUniformLocation(programObject,
+                "u_diffuseLight.intensity");
 
         // получить индексы атрибутов в вершинном шейдере
         positionLink = GLES20.glGetAttribLocation(programObject, "a_position");
         textureCoordinatesLink = GLES20.glGetAttribLocation(programObject, "a_textureCoordinates");
         normalLink = GLES20.glGetAttribLocation(programObject, "a_normal");
+
     /*
     Log.v(TAG, className +
             ": u_mvpMatrix id: " + mvpMatrixLink + "; u_mvMatrix id: " +
-            mvMatrixLink + "; s_texture id: " + samplerLink + "; textureID: " + textureID);
-    */
+            mvMatrixLink + "; s_texture id: "
+            + samplerLink + "; u_ambientLight.color id: " + ambientLightColorLink +
+            "; u_diffuseLight.color id: " + diffuseLightColorLink +
+            "; u_diffuseLight.intensity id: " + diffuseLightIntensityLink +
+            "; textureID: " + textureID);
+
+     */
         createVertexBuffers();
-
-
-
     }
 
     private void createVertexBuffers() {
@@ -126,7 +143,7 @@ public class Anisotropy extends Object3D implements Asteroid {
 
     @Override
     public void setView(View3D view) {
-        if (view instanceof AnisotropyView3D) this.view = (AnisotropyView3D) view;
+        if (view instanceof CellView3D) this.view = (CellView3D) view;
     }
 
     @Override
@@ -172,6 +189,14 @@ public class Anisotropy extends Object3D implements Asteroid {
                 false, NORMAL_STRIDE, 0);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
+        // передать в шейдер трехкомпонентный вектор цвета(белый) для
+        // окружающего света
+        GLES20.glUniform3f(ambientLightColorLink, 1.0f, 1.0f, 1.0f);
+        // передать в шейдер интенсивность окружающего света
+        GLES20.glUniform1f(ambientLightIntensityLink, 0.2f);
+
+        GLES20.glUniform3f(diffuseLightColorLink, 1.0f, 1.0f, 1.0f);
+        GLES20.glUniform1f(diffuseLightIntensityLink, 1.5f);
         // привязка к текстурному блоку. Функция задает текущий текстурный
         // блок, так что все дальнейшие вызовы glBindTexture привяжут
         // текстуру к активному текстурному блоку. Номер текстурного блока,
@@ -183,12 +208,14 @@ public class Anisotropy extends Object3D implements Asteroid {
         //привязать текстуру к активному текстурному блоку
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureID);
 
+
         // генерировать mipmap
         //GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
         // берется результат билинейной интерполяции между четырьмя значениями из ближайшего
         // уровня пирамиды. Для большинства GPU билинейная фильтрация быстрее трилинейной
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
                 GLES20.GL_LINEAR_MIPMAP_NEAREST);
+
 
         // рисовать с трилинейным фильтрованием
         //GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER,
@@ -216,7 +243,6 @@ public class Anisotropy extends Object3D implements Asteroid {
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, NUMBER_INDICES, GLES20.GL_UNSIGNED_INT, 0);
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
         // GLES30.glDisable(GLES30.GL_TEXTURE_2D);
-
         GLES20.glDisableVertexAttribArray(positionLink); // отключить атрибут вершин куба
         GLES20.glDisableVertexAttribArray(textureCoordinatesLink); // отключить атрибут координат текстуры
         GLES20.glDisableVertexAttribArray(normalLink); // отключить атрибут нормалей

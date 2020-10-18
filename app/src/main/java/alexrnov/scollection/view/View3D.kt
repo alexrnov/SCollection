@@ -95,4 +95,5 @@ abstract class View3D(val widthScreen: Int, private val heightScreen: Int) {
 
   fun getPointViewMatrixAsFloatBuffer(): FloatBuffer = Buffers.floatBuffer(pointViewMatrix)
 
+  fun getMMatrixAsFloatBuffer(): FloatBuffer = Buffers.floatBuffer(modelMatrix)
 }

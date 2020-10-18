@@ -14,7 +14,6 @@ import alexrnov.scollection.R;
 public class LightFragment extends Fragment {
 
     private LightViewModel lightViewModel;
-    private LightSurfaceView lightSurfaceView; // используется в случае вывода рендера в отдельный компонент интерфейса
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -22,8 +21,8 @@ public class LightFragment extends Fragment {
                 ViewModelProviders.of(this).get(LightViewModel.class);
         View root = inflater.inflate(R.layout.fragment_light, container, false);
 
-        lightSurfaceView = root.findViewById(R.id.oglViewLight);
-        lightSurfaceView.init(this.getActivity());
+        //lightSurfaceView = root.findViewById(R.id.oglViewLight);
+        //lightSurfaceView.init(this.getActivity());
         return root;
 
     }
@@ -31,12 +30,12 @@ public class LightFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        lightSurfaceView.onResume();
+        //lightSurfaceView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        lightSurfaceView.onPause();
+        //lightSurfaceView.onPause();
     }
 }

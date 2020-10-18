@@ -13,12 +13,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import alexrnov.scollection.ui.light.LightSurfaceView;
-
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-    private LightSurfaceView lightSurfaceView; // используется в случае вывода рендера в отдельный компонент интерфейса
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,17 +33,22 @@ public class MainActivity extends AppCompatActivity {
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
+
+
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_light, R.id.nav_gallery, R.id.nav_slideshow)
+                R.id.nav_slideshow, R.id.nav_light, R.id.nav_gallery)
                 .setDrawerLayout(drawer)
                 .build();
+
+
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-
+        //navigationView.getMenu().getItem(0).setChecked(true);
+        //navigationView.setCheckedItem(R.id.nav_slideshow);
         //oglView = findViewById(R.id.oglView);
         //oglView.init(this.getApplicationContext());
 

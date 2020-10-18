@@ -10,7 +10,7 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+        GLES20.glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
     }
 
     @Override

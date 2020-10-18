@@ -4,8 +4,6 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
-import alexrnov.scollection.ui.light.LightSceneRenderer;
-
 public class GallerySurfaceView extends GLSurfaceView {
     private GallerySceneRenderer renderer;
 
@@ -19,7 +17,7 @@ public class GallerySurfaceView extends GLSurfaceView {
 
     public void init(Context context) {
         setPreserveEGLContextOnPause(true); // сохранять контескт OpenGL
-        setEGLContextClientVersion(2);
+        setEGLContextClientVersion(3);
         renderer = new GallerySceneRenderer();
         setRenderer(renderer);
         //осуществлять рендеринг только когда изминились данные для рисования

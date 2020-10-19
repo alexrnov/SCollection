@@ -107,7 +107,6 @@ public class GallerySceneRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl) {
         delta = meanValue.add(interpolationRatio);
-        Log.i("P", "delta = " + delta);
         //установить буфер цвета
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         // ориентация против часовой стрелки (используется по умолчанию)

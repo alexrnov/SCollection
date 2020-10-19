@@ -10,4 +10,5 @@
     <string name="menu_light">Light</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_particles">Particles</string>
 </resources>

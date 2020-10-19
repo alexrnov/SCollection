@@ -1,4 +1,4 @@
-package alexrnov.scollection.ui.slideshow;
+package alexrnov.scollection.ui.particles;
 
 import android.content.Context;
 import android.opengl.GLES20;
@@ -9,13 +9,15 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import alexrnov.scollection.R;
+import alexrnov.scollection.gles.objects.BackgroundObject3D;
+import alexrnov.scollection.gles.objects.Explosion;
+import alexrnov.scollection.gles.objects.ExplosionGLES30;
 import alexrnov.scollection.gles.objects.Wave;
 import alexrnov.scollection.gles.objects.Wave2;
-import alexrnov.scollection.gles.objects.BackgroundObject3D;
 import alexrnov.scollection.utils.MeanValue;
 import alexrnov.scollection.view.BackgroundView3D;
 
-public class SlideSceneRenderer implements GLSurfaceView.Renderer {
+public class ParticlesSceneRenderer implements GLSurfaceView.Renderer {
 
     private Context context; // нужно ли синхронизировать?
     private double versionGL;
@@ -43,11 +45,13 @@ public class SlideSceneRenderer implements GLSurfaceView.Renderer {
 
     private float delta;
 
-    private BackgroundObject3D backgroundObject3D; // нужно ли синхронизировать?
-    private BackgroundObject3D backgroundObject3D2;
+    //private BackgroundObject3D backgroundObject3D; // нужно ли синхронизировать?
+    //private BackgroundObject3D backgroundObject3D2;
 
+    Explosion explosion;
+    Explosion explosion2;
 
-    public SlideSceneRenderer(double versionGL, Context context) {
+    public ParticlesSceneRenderer(double versionGL, Context context) {
         this.versionGL = versionGL;
         this.context = context;
     }
@@ -58,8 +62,10 @@ public class SlideSceneRenderer implements GLSurfaceView.Renderer {
 
         // реализация делает предпочтение на быстродействие
         GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
-        backgroundObject3D = new Wave(versionGL, context, 2.4f, R.raw.grid_texture);
-        backgroundObject3D2 = new Wave2(versionGL, context, 2.4f, R.raw.grid_texture);
+        //backgroundObject3D = new Wave(versionGL, context, 2.4f, R.raw.grid_texture);
+        //backgroundObject3D2 = new Wave2(versionGL, context, 2.4f, R.raw.grid_texture);
+        explosion = new ExplosionGLES30(context, "explosion/star.png", new float[] {1.0f, 0.5f, 0.1f, 1.0f});
+        explosion2 = new ExplosionGLES30(context, "explosion/star.png", new float[] {0.3f, 1.0f, 0.3f, 1.0f});
     }
 
     @Override
@@ -72,8 +78,13 @@ public class SlideSceneRenderer implements GLSurfaceView.Renderer {
 
         GLES20.glViewport(0, 0, width, height); // установить размер экрана
         if (firstRun) { // первый запуск приложения
-            backgroundObject3D.setView(new BackgroundView3D(-5.0f, 4.0f, -3.0f, width, height));
-            backgroundObject3D2.setView(new BackgroundView3D(5.0f, 4.0f, -3.0f, width, height));
+            //backgroundObject3D.setView(new BackgroundView3D(-5.0f, 4.0f, -4.0f, width, height));
+            //backgroundObject3D2.setView(new BackgroundView3D(5.0f, 4.0f, -4.0f, width, height));
+            explosion.create(-0.4f, 0.0f, 0.7f);
+            explosion.createDataVertex(width, height);
+
+            explosion2.create(0.4f, 0.0f, 0.7f);
+            explosion2.createDataVertex(width, height);
         }
         firstRun = false;
     }
@@ -92,8 +103,11 @@ public class SlideSceneRenderer implements GLSurfaceView.Renderer {
         // материала, иначе объекты будут выглядеть неправильно
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 
-        backgroundObject3D.draw(delta);
-        backgroundObject3D2.draw(delta);
+        //backgroundObject3D.draw(delta);
+        //backgroundObject3D2.draw(delta);
+
+        explosion.draw(delta);
+        explosion2.draw(delta);
 
         defineDeltaTime();
     }

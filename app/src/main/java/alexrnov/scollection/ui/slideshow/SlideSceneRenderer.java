@@ -12,6 +12,7 @@ import alexrnov.scollection.R;
 import alexrnov.scollection.gles.objects.Wave;
 import alexrnov.scollection.gles.objects.Wave2;
 import alexrnov.scollection.gles.objects.BackgroundObject3D;
+import alexrnov.scollection.gles.objects.WaveReal;
 import alexrnov.scollection.utils.MeanValue;
 import alexrnov.scollection.view.BackgroundView3D;
 
@@ -45,6 +46,7 @@ public class SlideSceneRenderer implements GLSurfaceView.Renderer {
 
     private BackgroundObject3D backgroundObject3D; // нужно ли синхронизировать?
     private BackgroundObject3D backgroundObject3D2;
+    private BackgroundObject3D backgroundObject3dReal;
 
 
     public SlideSceneRenderer(double versionGL, Context context) {
@@ -58,8 +60,9 @@ public class SlideSceneRenderer implements GLSurfaceView.Renderer {
 
         // реализация делает предпочтение на быстродействие
         GLES20.glHint(GLES20.GL_GENERATE_MIPMAP_HINT, GLES20.GL_FASTEST);
-        backgroundObject3D = new Wave(versionGL, context, 2.4f, R.raw.grid_texture);
-        backgroundObject3D2 = new Wave2(versionGL, context, 2.4f, R.raw.grid_texture);
+        backgroundObject3D = new Wave(versionGL, context, 2.4f, R.raw.multi_texture2);
+        backgroundObject3D2 = new Wave2(versionGL, context, 2.4f, R.raw.multi_texture2);
+        backgroundObject3dReal = new WaveReal(versionGL, context, 2.4f, R.raw.grid_texture);
     }
 
     @Override
@@ -74,6 +77,7 @@ public class SlideSceneRenderer implements GLSurfaceView.Renderer {
         if (firstRun) { // первый запуск приложения
             backgroundObject3D.setView(new BackgroundView3D(-5.0f, 4.0f, -3.0f, width, height));
             backgroundObject3D2.setView(new BackgroundView3D(5.0f, 4.0f, -3.0f, width, height));
+            backgroundObject3dReal.setView(new BackgroundView3D(0.0f, -4.0f, -5.0f, width, height));
         }
         firstRun = false;
     }
@@ -94,6 +98,7 @@ public class SlideSceneRenderer implements GLSurfaceView.Renderer {
 
         backgroundObject3D.draw(delta);
         backgroundObject3D2.draw(delta);
+        backgroundObject3dReal.draw(delta);
 
         defineDeltaTime();
     }

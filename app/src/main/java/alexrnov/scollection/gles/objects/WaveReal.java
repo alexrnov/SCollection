@@ -1,117 +1,80 @@
 package alexrnov.scollection.gles.objects;
 
+import static alexrnov.scollection.gles.Textures.loadTextureWithMipMapFromRaw;
+
 import android.content.Context;
 import android.opengl.GLES20;
 
-import alexrnov.cosmichunter.view.View3D;
 import alexrnov.scollection.R;
 import alexrnov.scollection.gles.LinkedProgram;
-import alexrnov.scollection.view.AsteroidView3D;
-import alexrnov.scollection.view.IridescenceView3D;
+import alexrnov.scollection.view.BackgroundView3D;
+import alexrnov.scollection.view.ChangeCameraView3D;
 
-import static alexrnov.scollection.gles.Textures.loadTextureWithMipMapFromRaw;
 
 //import android.util.Log;
 //import static alexrnov.cosmichunter.Initialization.TAG;
 
-/** Класс для планеты, которая используется в четвертом уровне */
-public class Iridescence extends Object3D implements Asteroid {
+public class WaveReal extends BackgroundObject3D {
   private final int programObject;
+  private ChangeCameraView3D view;
+
   // ссылка на переменную вершинного шейдера, содержащую итоговую MVP-матрицу
   private final int mvpMatrixLink;
   // ссылка на переменную вершинного шейдера, содержащую модельно-видовую матрицу
   private final int mvMatrixLink;
-  // ссылка на переменную вершинного шейдера, содержащую матрицу вида для точки обзора
-  private final int pointViewMatrixLink;
-  // ссылка на переменную вершинного шейдера, которая является семплером
-  private final int samplerLink;
-  // ссылка на переменную вершинного шейдера, содержащую вектор цвета
-  // внешнего освещения
-  private final int ambientLightColorLink;
-  // ссылка на переменную вершинного шейдера, содержащую значение
-  // интенсивности внешнего освещения
-  private final int ambientLightIntensityLink;
-  // ссылка на переменную вершинного шейдера, содержащую вектор цвета
-  // диффузного освещения
-  private final int diffuseLightColorLink;
-  // ссылка на переменную вершинного шейдера, содержащую значение
-  // интенсивности диффузного освещения
-  private final int diffuseLightIntensityLink;
-  // обработчик текстуры
-  private final int textureID;
+  private final int samplerLink;// ссылка на переменную-семплер вершинного шейдера
+  private final int textureID; // обработчик текстуры
+  private final int lastTimeLink;
+
+  private final int[] VBO = new int[4];
 
   private final int positionLink; // индекс переменной атрибута для вершин
   private final int textureCoordinatesLink; // индекс переменной атрибута для текстурных координат
   private final int normalLink; // индекс переменной атрибута для нормали
 
-  private IridescenceView3D view;
-  private final int[] VBO = new int[4];
+  private float lastTime = 2.0f;
 
-  private Explosion explosion;
 
-  public Iridescence(double versionGL, Context context, float scale, String objectPath) { //, TypeAsteroid type) {
-    super(context, scale, objectPath);
-
-    //загрузка шейдеров из каталога raw
-    //LinkedProgram linkedProgramGL = new LinkedProgram(context,
-    //R.raw.vertex_shader, R.raw.fragment_shader);
+  public WaveReal(double versionGL, Context context, float scale, int textureIDResource) {
+    super(context, scale, R.raw.grid5);
 
     LinkedProgram linkProgram = null;
     if (versionGL == 2.0) {
       linkProgram = new LinkedProgram(context,
-              "shaders/gles20/planet_v.glsl",
-              "shaders/gles20/planet_f.glsl");
+              "shaders/gles20/background_v.glsl",
+              "shaders/gles20/background_f.glsl");
     } else if (versionGL == 3.0) {
       linkProgram = new LinkedProgram(context,
-              "shaders/gles30/iridescence_v.glsl",
-              "shaders/gles30/iridescence_f.glsl");
+              "shaders/gles30/wave_real_v.glsl",
+              "shaders/gles30/wave_real_f.glsl");
     }
 
-    //final String className = this.getClass().getSimpleName() + ".class: ";
-    programObject = linkProgram.get();
-    //if (programObject == 0) {
-      //Log.v(TAG, className + "error program link asteroid: " + programObject);
-    //}
 
-    //связать a_position с атрибутом 0 в шейдере
-    //(необязательно, т.к. a_position связывается со значением через location)
-    //в glVertexAttribPointer(0)
-    //GLES30.glBindAttribLocation(this.programObject, 0, "a_position");
+    programObject = linkProgram.get();
+    //final String className = this.getClass().getSimpleName() + ".class: ";
+    //if (programObject == 0) {
+      //Log.e(TAG, className + "error program link background: " + programObject);
+    //}
 
     //Получить ссылку на переменную, содержащую итоговую MPV-матрицу.
     //Эта переменная находится в вершинном шейдере: uniform mat4 u_mvpMatrix;
     mvpMatrixLink = GLES20.glGetUniformLocation(programObject, "u_mvpMatrix");
-    // получить индексы для индентификации uniform-переменных в программе
     mvMatrixLink = GLES20.glGetUniformLocation(programObject, "u_mvMatrix");
-    pointViewMatrixLink = GLES20.glGetUniformLocation(programObject, "u_pointViewMatrix");
     //получить местоположение семплера
     samplerLink = GLES20.glGetUniformLocation(programObject, "s_texture");
-    //textureID = loadTextureFromRaw(context, R.raw.dolerite_texture);
-    textureID = loadTextureWithMipMapFromRaw(context, R.raw.iridescence_texture); //загрузить текстуру
-    ambientLightColorLink = GLES20.glGetUniformLocation(programObject,
-            "u_ambientLight.color");
-    ambientLightIntensityLink = GLES20.glGetUniformLocation(programObject,
-            "u_ambientLight.intensity");
-    diffuseLightColorLink = GLES20.glGetUniformLocation(programObject,
-            "u_diffuseLight.color");
-    diffuseLightIntensityLink = GLES20.glGetUniformLocation(programObject,
-            "u_diffuseLight.intensity");
+    lastTimeLink = GLES20.glGetUniformLocation(programObject, "u_lastTime");
+
+    //textureID = Textures.loadTextureFromRaw(context, textureIDResource); //загрузить текстуру
+    textureID = loadTextureWithMipMapFromRaw(context, textureIDResource); //загрузить текстуру
+
 
     // получить индексы атрибутов в вершинном шейдере
     positionLink = GLES20.glGetAttribLocation(programObject, "a_position");
     textureCoordinatesLink = GLES20.glGetAttribLocation(programObject, "a_textureCoordinates");
     normalLink = GLES20.glGetAttribLocation(programObject, "a_normal");
 
-    /*
-    Log.v(TAG, className +
-            ": u_mvpMatrix id: " + mvpMatrixLink + "; u_mvMatrix id: " +
-            mvMatrixLink + "; s_texture id: "
-            + samplerLink + "; u_ambientLight.color id: " + ambientLightColorLink +
-            "; u_diffuseLight.color id: " + diffuseLightColorLink +
-            "; u_diffuseLight.intensity id: " + diffuseLightIntensityLink +
-            "; textureID: " + textureID);
-
-     */
+    //Log.v(TAG, this.getClass().getSimpleName() + ".class: u_mvpMatrix id: " +
+           // mvpMatrixLink + "; s_texture id: " + samplerLink + "; textureID: " + textureID);
     createVertexBuffers();
   }
 
@@ -144,18 +107,22 @@ public class Iridescence extends Object3D implements Asteroid {
   }
 
   @Override
-  public void setView(View3D view) {
-    if (view instanceof IridescenceView3D) this.view = (IridescenceView3D) view;
+  public void setView(ChangeCameraView3D view) {
+    if (view instanceof BackgroundView3D) this.view = (BackgroundView3D) view;
+    //достаточно вызвать один раз, поскольку у фона нет анимации
+    this.view.spotPosition(0.0f);
   }
 
   @Override
-  public AsteroidView3D getView() {
+  public ChangeCameraView3D getView() {
     return view;
   }
 
   @Override
-  public void draw() {
+  public void draw(float delta) {
+    lastTime += delta * 0.051f;
     GLES20.glUseProgram(programObject);
+    GLES20.glUniform1f(lastTimeLink, lastTime);
     // включение вершинного массива для атрибута(in vec4 a_position). Если
     // для заданного индекса атрибута вершинный массив выключен, то для
     // этого атрибута будет использоваться соответствующее постоянное значение
@@ -191,23 +158,17 @@ public class Iridescence extends Object3D implements Asteroid {
             false, NORMAL_STRIDE, 0);
     GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
+    /*
     // передать в шейдер трехкомпонентный вектор цвета(белый) для
     // окружающего света
     GLES20.glUniform3f(ambientLightColorLink, 1.0f, 1.0f, 1.0f);
     // передать в шейдер интенсивность окружающего света
-    GLES20.glUniform1f(ambientLightIntensityLink, 0.6f);
+    GLES20.glUniform1f(ambientLightIntensityLink, 0.2f);
 
     GLES20.glUniform3f(diffuseLightColorLink, 1.0f, 1.0f, 1.0f);
-    GLES20.glUniform1f(diffuseLightIntensityLink, 0.6f);
+    GLES20.glUniform1f(diffuseLightIntensityLink, 1.5f);
 
-
-    GLES20.glEnable(GLES20.GL_BLEND);
-    //GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA, GLES30.GL_ONE);
-
-
-    GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-
-
+     */
     // привязка к текстурному блоку. Функция задает текущий текстурный
     // блок, так что все дальнейшие вызовы glBindTexture привяжут
     // текстуру к активному текстурному блоку. Номер текстурного блока,
@@ -238,10 +199,10 @@ public class Iridescence extends Object3D implements Asteroid {
     GLES20.glUniform1i(samplerLink, 0);
     // MV-матрица загружается в соответствующую uniform-переменную
     GLES20.glUniformMatrix4fv(mvMatrixLink, 1, false,
-            view.getMVNoScaleMatrixAsFloatBuffer());
+            view.getMVMatrixAsFloatBuffer());
 
-    GLES20.glUniformMatrix4fv(pointViewMatrixLink, 1, false,
-            view.getPointViewMatrixAsFloatBuffer());
+    //GLES20.glUniformMatrix4fv(pointViewMatrixLink, 1, false,
+            //view.getPointViewMatrixAsFloatBuffer());
 
     // итоговая MVP-матрица загружается в соответствующую uniform-переменную
     GLES20.glUniformMatrix4fv(mvpMatrixLink, 1, false,
@@ -254,24 +215,10 @@ public class Iridescence extends Object3D implements Asteroid {
     GLES20.glDrawElements(GLES20.GL_TRIANGLES, NUMBER_INDICES, GLES20.GL_UNSIGNED_INT, 0);
     GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
     // GLES30.glDisable(GLES30.GL_TEXTURE_2D);
-
-    // отключить прозрачность, чтобы все объекты сцены не были прозрачными
-    GLES20.glDisable(GLES20.GL_BLEND);
-
     GLES20.glDisableVertexAttribArray(positionLink); // отключить атрибут вершин куба
     GLES20.glDisableVertexAttribArray(textureCoordinatesLink); // отключить атрибут координат текстуры
     GLES20.glDisableVertexAttribArray(normalLink); // отключить атрибут нормалей
 
     //GLES30.glFinish();
-  }
-
-  @Override
-  public void setExplosion(Explosion explosion) {
-    this.explosion = explosion;
-  }
-
-  @Override
-  public Explosion getExplosion() {
-    return explosion;
   }
 }

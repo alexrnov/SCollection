@@ -2,6 +2,7 @@ package alexrnov.scollection.gles.objects;
 
 import android.content.Context;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import alexrnov.cosmichunter.view.View3D;
 import alexrnov.scollection.R;
@@ -158,7 +159,7 @@ public class Diffuse extends Object3D implements Asteroid {
         // для заданного индекса атрибута вершинный массив выключен, то для
         // этого атрибута будет использоваться соответствующее постоянное значение
         GLES20.glEnableVertexAttribArray(positionLink); // разрешить атрибут вершин куба
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
+        //GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[0]);
         // Метод glVertexAttribPointer загружет вершинные массивы. Size - число
         // компонент в вершинном массиве для заданного атрибута. Допустимые
         // значения 1 - 4. Stride - смещение в байтах между вершиной I и вершиной
@@ -167,28 +168,33 @@ public class Diffuse extends Object3D implements Asteroid {
         // получения данных для следующей вершины. Для лучшего быстродействия
         // предпочтительно использовать GLES30.GL_HALF_FLOAT (не работает)
         // Загрузить данные вершин (location = 0)
-        GLES20.glVertexAttribPointer(positionLink, VERTEX_COMPONENT, GLES20.GL_FLOAT,
-                false, VERTEX_STRIDE, 0);
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+        //GLES20.glVertexAttribPointer(positionLink, VERTEX_COMPONENT, GLES20.GL_FLOAT,
+                //false, VERTEX_STRIDE, 0);
+        GLES30.glVertexAttribPointer(positionLink, 3, GLES30.GL_FLOAT,
+                false, 0, bufferVertices);
+        //GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
         //включение массива текстурных координат для атрибута(in vec4 a_position)
         GLES20.glEnableVertexAttribArray(textureCoordinatesLink);//разрешить атрибут координат текстуры
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[1]);
+        //GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[1]);
         //загрузить текстурные координаты (location = 1)
-        GLES20.glVertexAttribPointer(textureCoordinatesLink, TEXTURE_COMPONENT, GLES20.GL_FLOAT,
-                false, TEXTURE_STRIDE, 0);
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+        //GLES20.glVertexAttribPointer(textureCoordinatesLink, TEXTURE_COMPONENT, GLES20.GL_FLOAT,
+                //false, TEXTURE_STRIDE, 0);
+        GLES20.glVertexAttribPointer(textureCoordinatesLink, 2, GLES30.GL_FLOAT,
+                false, 0, bufferTextureCoordinates);
+        //GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
         GLES20.glEnableVertexAttribArray(normalLink);
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[2]);
+        //GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, VBO[2]);
         // индекс переменной атрибута можно получить следущим образом
         // int a_normal_Handle = GLES30.glGetAttribLocation(programObject, "a_Normal");
         // но мы просто указываем индекс 2, поскольку в шейдере он обазначен
         // с помощью ключевого слова location
-        GLES20.glVertexAttribPointer(normalLink, NORMAL_COMPONENT, GLES20.GL_FLOAT,
-                false, NORMAL_STRIDE, 0);
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
-
+        //GLES20.glVertexAttribPointer(normalLink, NORMAL_COMPONENT, GLES20.GL_FLOAT,
+                //false, NORMAL_STRIDE, 0);
+        //GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
+        GLES20.glVertexAttribPointer(normalLink, 3, GLES20.GL_FLOAT,
+                false, 0 , bufferNormals);
         // передать в шейдер трехкомпонентный вектор цвета(белый) для
         // окружающего света
         GLES20.glUniform3f(ambientLightColorLink, 1.0f, 1.0f, 1.0f);

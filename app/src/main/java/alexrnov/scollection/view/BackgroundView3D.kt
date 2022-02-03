@@ -18,6 +18,8 @@ class BackgroundView3D(x: Float, y: Float, z: Float, widthScreen: Int, heightScr
     // переместить куб вверх/вниз и влево/вправо
     Matrix.translateM(modelMatrix, 0, x, y, z)
     Matrix.rotateM(modelMatrix, 0, 1.0f, 90.0f, -180.0f, -180.0f)
+    // Matrix.rotateM(modelMatrix, 0, 30.0f, 1.0f, 0.0f, 0.0f)
+    //Matrix.rotateM(modelMatrix, 0, 1.0f, 1.0f, 0.0f, 0.0f)
     // комбинировать видовую и модельные матрицы
     Matrix.multiplyMM(modelViewMatrix, 0, viewMatrix, 0, modelMatrix, 0)
     // комбинировать модельно-видовую матрицу и проектирующую матрицу

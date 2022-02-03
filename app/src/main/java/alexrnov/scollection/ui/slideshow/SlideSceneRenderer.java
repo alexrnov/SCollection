@@ -77,7 +77,7 @@ public class SlideSceneRenderer implements GLSurfaceView.Renderer {
         if (firstRun) { // первый запуск приложения
             backgroundObject3D.setView(new BackgroundView3D(-5.0f, 4.0f, -3.0f, width, height));
             backgroundObject3D2.setView(new BackgroundView3D(5.0f, 4.0f, -3.0f, width, height));
-            backgroundObject3dReal.setView(new BackgroundView3D(0.0f, -4.0f, -5.0f, width, height));
+            backgroundObject3dReal.setView(new BackgroundView3D(0.0f, 1.0f, -4.0f, width, height));
         }
         firstRun = false;
     }
